@@ -1,7 +1,7 @@
 import { LightningElement } from 'lwc';
-import { userInfo } from 'c/userInfo';
+import { UserInfo } from 'c/userInfo';
 
-export default class TestComponent extends userInfo(LightningElement) {
+export default class TestComponent extends UserInfo(LightningElement) {
 
     connectedCallback() {
         this.showConsoleLog();
