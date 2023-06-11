@@ -35,7 +35,7 @@ export default class TestPromise extends LightningElement {
     fifthResult;
 
     connectedCallback() {
-        this.callFirstPromise()
+        this.callPromises()
     }
 
     callFirstPromise() {
@@ -77,6 +77,12 @@ export default class TestPromise extends LightningElement {
             })
     }
 
-
+    async callPromises() {
+        this.firstResult = await firstMultiplyBy2({inputNumber: 1});
+        this.secondtResult = await secondMultiplyBy2({inputNumber: 2});
+        this.thirdResult = await thirdMultiplyBy2({inputNumber: 3});
+        this.fourthResult = await fourthMultiplyBy2({inputNumber: 4});
+        this.fifthResult = await fifthMultiplyBy2({inputNumber: 5});
+    }
 
 }
