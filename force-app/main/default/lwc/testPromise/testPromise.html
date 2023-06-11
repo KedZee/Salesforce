@@ -2,11 +2,10 @@
     <div style="background: white; border-radius: 5px;">
         <lightning-vertical-navigation>
             <lightning-vertical-navigation-section label="Promise Result">
-                <div style="padding: 5px 30px;">{firstResult}</div>
-                <div style="padding: 5px 30px;">{secondtResult}</div>
-                <div style="padding: 5px 30px;">{thirdResult}</div>
-                <div style="padding: 5px 30px;">{fourthResult}</div>
-                <div style="padding: 5px 30px;">{fifthResult}</div>
+                <template for:each={elements} for:item="elem">
+                    <div key={elem} style="padding: 5px 30px;">{elem}</div>
+                </template>
+
             </lightning-vertical-navigation-section>
         </lightning-vertical-navigation>
     </div>
