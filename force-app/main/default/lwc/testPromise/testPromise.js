@@ -1,120 +1,52 @@
-import { LightningElement } from 'lwc';
-import firstMultiplyBy2 from '@salesforce/apex/mockDelays.firstMultiplyBy2';
-import secondMultiplyBy2 from '@salesforce/apex/mockDelays.secondMultiplyBy2';
-import thirdMultiplyBy2 from '@salesforce/apex/mockDelays.thirdMultiplyBy2';
-import fourthMultiplyBy2 from '@salesforce/apex/mockDelays.fourthMultiplyBy2';
-import fifthMultiplyBy2 from '@salesforce/apex/mockDelays.fifthMultiplyBy2';
+import { LightningElement, track } from 'lwc';
+import multiplyBy2 from '@salesforce/apex/mockDelays.multiplyBy2';
+import multiplyBy3 from '@salesforce/apex/mockDelays.multiplyBy3';
+import multiplyBy4 from '@salesforce/apex/mockDelays.multiplyBy4';
+import multiplyBy5 from '@salesforce/apex/mockDelays.multiplyBy5';
+import multiplyBy6 from '@salesforce/apex/mockDelays.multiplyBy6';
 
 export default class TestPromise extends LightningElement {
 
-    // это первый вариант, который мог бы быть, но от него я отказался, потому что
-    // код растет в ширь
-
-    // connectedCallback() {
-    //     firstMultiplyBy2({inputNumber: 1}).then(result => {
-    //         console.log('result=1==', result)
-    //         secondMultiplyBy2({inputNumber: 2}).then(result => {
-    //             console.log('result=2==', result)
-    //             thirdMultiplyBy2({inputNumber: 3}).then(result => {
-    //                 console.log('result=3==', result)
-    //                 fourthMultiplyBy2({inputNumber: 4}).then(result => {
-    //                     console.log('result=4==', result)
-    //                     fifthMultiplyBy2({inputNumber: 5}).then(result => {
-    //                         console.log('result=5==', result)
-    //                     })
-    //                 })
-    //             })
-    //         })
-    //     })
-    // }
-
-    initialValue = 1;
-    elements = [];
-
-    firstResult;
-    secondtResult;
-    thirdResult;
-    fourthResult;
-    fifthResult;
+    @track elements = [];
 
     connectedCallback() {
-        this.callFirstPromise()
+        this.callPyramid()
     }
 
-    callFirstPromise() {
-        firstMultiplyBy2({inputNumber: this.initialValue})
-            .then(result => {
-                this.initialValue = result;
-                this.elements.push(this.initialValue);
-                this.elements = JSON.parse(JSON.stringify(this.elements));
-
-                this.callSecondPromise();
+    callPyramid() {
+        multiplyBy2({inputNumber: 1}).then(result => {
+            this.elements.push(result);
+            multiplyBy3({inputNumber: result}).then(result => {
+                this.elements.push(result);
+                multiplyBy4({inputNumber: result}).then(result => {
+                    this.elements.push(result);
+                    multiplyBy5({inputNumber: result}).then(result => {
+                        this.elements.push(result);
+                        multiplyBy6({inputNumber: result}).then(result => {
+                            this.elements.push(result);
+                        })
+                    })
+                })
             })
-    }
-
-    callSecondPromise() {
-        secondMultiplyBy2({inputNumber: this.initialValue})
-            .then(result => {
-                this.initialValue = result;
-                this.elements.push(this.initialValue);
-                this.elements = JSON.parse(JSON.stringify(this.elements));
-
-                this.callThirdPromise();
-            })
-    }
-
-    callThirdPromise() {
-        thirdMultiplyBy2({inputNumber: this.initialValue})
-            .then(result => {
-                this.initialValue = result;
-                this.elements.push(this.initialValue);
-                this.elements = JSON.parse(JSON.stringify(this.elements));
-
-                this.callFourthPromise();
-            })
-    }
-
-    callFourthPromise() {
-        fourthMultiplyBy2({inputNumber: this.initialValue})
-            .then(result => {
-                this.initialValue = result;
-                this.elements.push(this.initialValue);
-                this.elements = JSON.parse(JSON.stringify(this.elements));
-
-                this.callFifthPromise();
-            })
-    }
-
-    callFifthPromise() {
-        fifthMultiplyBy2({inputNumber: this.initialValue})
-            .then(result => {
-                this.initialValue = result;
-                this.elements.push(this.initialValue);
-                this.elements = JSON.parse(JSON.stringify(this.elements));
-            })
+        })
     }
 
     async callAsync() {
-        this.initialValue = await firstMultiplyBy2({inputNumber: this.initialValue});
-        this.elements.push(this.initialValue);
-        this.elements = JSON.parse(JSON.stringify(this.elements));
+        let initialValue = 1;
 
-        this.initialValue = await secondMultiplyBy2({inputNumber: this.initialValue});
-        this.elements.push(this.initialValue);
-        this.elements = JSON.parse(JSON.stringify(this.elements));
+        initialValue = await multiplyBy2({inputNumber: initialValue});
+        this.elements.push(initialValue);
 
-        this.initialValue = await thirdMultiplyBy2({inputNumber: this.initialValue});
-        this.elements.push(this.initialValue);
-        this.elements = JSON.parse(JSON.stringify(this.elements));
+        initialValue = await multiplyBy3({inputNumber: initialValue});
+        this.elements.push(initialValue);
 
-        this.initialValue = await fourthMultiplyBy2({inputNumber: this.initialValue});
-        this.elements.push(this.initialValue);
-        this.elements = JSON.parse(JSON.stringify(this.elements));
+        initialValue = await multiplyBy4({inputNumber: initialValue});
+        this.elements.push(initialValue);
 
-        this.initialValue = await fifthMultiplyBy2({inputNumber: this.initialValue});
-        this.elements.push(this.initialValue);
-        this.elements = JSON.parse(JSON.stringify(this.elements));
+        initialValue = await multiplyBy5({inputNumber: initialValue});
+        this.elements.push(initialValue);
 
+        initialValue = await multiplyBy6({inputNumber: initialValue});
+        this.elements.push(initialValue);
     }
-
 }
