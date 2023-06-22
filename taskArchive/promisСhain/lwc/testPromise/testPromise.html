@@ -1,0 +1,12 @@
+<template>
+    <div style="background: white; border-radius: 5px;">
+        <lightning-vertical-navigation>
+            <lightning-vertical-navigation-section label="Promise Result">
+                <template for:each={elements} for:item="elem">
+                    <div key={elem} style="padding: 5px 30px;">{elem}</div>
+                </template>
+
+            </lightning-vertical-navigation-section>
+        </lightning-vertical-navigation>
+    </div>
+</template>
