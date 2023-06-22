@@ -10,25 +10,25 @@ public with sharing class mockDelays {
     @AuraEnabled(cacheable=true)
     public static Integer multiplyBy3(Integer inputNumber) {
         mockDelay();
-        return inputNumber * 2;
+        return inputNumber * 3;
     }
 
     @AuraEnabled(cacheable=true)
     public static Integer multiplyBy4(Integer inputNumber) {
         mockDelay();
-        return inputNumber * 2;
+        return inputNumber * 4;
     }
 
     @AuraEnabled(cacheable=true)
     public static Integer multiplyBy5(Integer inputNumber) {
         mockDelay();
-        return inputNumber * 2;
+        return inputNumber * 5;
     }
 
     @AuraEnabled(cacheable=true)
     public static Integer multiplyBy6(Integer inputNumber) {
         mockDelay();
-        return inputNumber * 2;
+        return inputNumber * 6;
     }
 
     private static void mockDelay() {
