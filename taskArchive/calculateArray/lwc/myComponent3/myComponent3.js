@@ -12,7 +12,7 @@ export default class MyComponent3 extends LightningElement {
 
     connectedCallback() {
 
-        const myCalcHelperClass = new CalcHelperClass(this.myArray);
+        const myCalcHelperClass = new CalcHelperClass(this.myArray, this);
         myCalcHelperClass
             .plus3()
             .minus1()
@@ -20,17 +20,5 @@ export default class MyComponent3 extends LightningElement {
             .multiplyBy2()
             .minus1()
             .getProps()
-
-
-    //     let result = myCalcHelperClass.getProps()
-
-    //     const { prop1Value, prop2Value, prop3Value } = result;
-    //     this.prop1 = prop1Value;
-    //     this.prop2 = prop2Value;
-    //     this.prop3 = prop3Value;
-    
-    
     }
-
-
 }

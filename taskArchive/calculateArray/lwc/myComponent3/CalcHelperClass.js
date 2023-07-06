@@ -1,9 +1,11 @@
 class CalcHelperClass {
 
     myArray
+    context;
 
-    constructor(myArray) {
+    constructor(myArray, context) {
         this.myArray = myArray;
+        this.context = context;
     }
     
     minus1() {
@@ -24,25 +26,14 @@ class CalcHelperClass {
 
 
     getProps() { 
-        
-        // let prop1Value = this.myArray.reduce((sum, current) => sum + current, 0);
-        // let prop2Value = this.myArray.reduce((sum, current) => current % 2 === 0 ? sum + current : sum, 0);
-        // let prop3Value = this.myArray.reduce((sum, current) => (current % 2 !== 0) && (current >= 5 && current <= 10) ? sum + current : sum, 0);
-
-        // return {
-        //     prop1Value,
-        //     prop2Value,
-        //     prop3Value
-        // }
-
         let prop1Value = this.myArray.reduce((sum, current) => sum + current, 0);
         let prop2Value = this.myArray.reduce((sum, current) => current % 2 === 0 ? sum + current : sum, 0);
         let prop3Value = this.myArray.reduce((sum, current) => (current % 2 !== 0) && (current >= 5 && current <= 10) ? sum + current : sum, 0);
 
 
-        this.prop1 = prop1Value;
-        this.prop2 = prop2Value;
-        this.prop3 = prop3Value; 
+        this.context.prop1 = prop1Value;
+        this.context.prop2 = prop2Value;
+        this.context.prop3 = prop3Value; 
     }
 }
 
