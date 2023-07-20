@@ -1,52 +1,89 @@
 public with sharing class customDataTableController {
 
     @AuraEnabled
-    public static List<sObject> getDataTable(String objectApiName, String fields){
-        String query = 'SELECT ' + fields.replace(';',', ') + ' FROM ' + objectApiName + ' LIMIT 10';
-        List<sObject> records =  Database.query(query);
-        return records;     
+    public static List<sObject> getData (String objectApiName, String fields){
+        String query = String.format('SELECT Id, {0} FROM {1} LIMIT 10', new List<String>{
+            fields.replace(';',', '), objectApiName
+        });
+        return Database.query(query);   
     }
 
     @AuraEnabled
-    public static String getColumnTable(String objectApiName, String fields){
-        List<ColumnWrapper> column = new  List<ColumnWrapper>();
-        for (String field : fields.split(';')) {
-            Schema.DescribeFieldResult fieldDescribe = getFieldDescribe(objectApiName, field);
-            String fieldType = String.valueOf(fieldDescribe.getType());
+    public static Map<String, Object> getDataTableInformation (String objectApiName, String fields){
+        List<ColumnWrapper> columns = new List<ColumnWrapper>();
+        Map<String, Object> dataOptions = new Map<String, Object>();
+        Map<String, Object> result = new Map<String, Object>();
 
-            if (fieldType == 'PICKLIST') {
-                Map<String, List<Schema.PicklistEntry>> picklistOptions = new Map<String, List<Schema.PicklistEntry>>();
+        String fieldReplase = fields.replace(';',', ');
+        List<String> fieldList = fields.split(';'); 
+        Map<String,Schema.SObjectField> objectDescribe = getObjectDescribe(objectApiName);
+
+        for (String field : fieldList) {
+            Schema.DescribeFieldResult fieldInformation = objectDescribe.get(field).getDescribe();
+            Schema.DisplayType apexFieldType = fieldInformation.getType();
             
-                picklistOptions.put(field +  + '_options', fieldDescribe.getPicklistValues());
-                column.add(new ColumnWrapper(objectApiName, field, 'picklistColumn', new TypeAttributes(field, picklistOptions)));
-            } else if (fieldType == 'STRING') {
-                column.add(new ColumnWrapper(objectApiName, field, 'text', null));
-            } else {
-                column.add(new ColumnWrapper(objectApiName, field, fieldType.toLowerCase(), null));
+            switch on apexFieldType {
+                when PICKLIST { 
+                    List<Map<String, String>> picklistOptions = new List<Map<String, String>>();
+
+                    for( Schema.PicklistEntry pickList : fieldInformation.getPicklistValues()){
+                        Map<String, String> picklistOption = new Map<String, String>();
+                        picklistOption.put('label', pickList.getLabel());
+                        picklistOption.put('value', pickList.getValue());
+                       
+                        picklistOptions.add(picklistOption);
+                    }     
+    
+                    dataOptions.put(field, picklistOptions);
+                    columns.add(new ColumnWrapper(field, 'picklistColumn', new TypeAttributes(field, 'Choose' + field, 'Id')));
+                }
+                when STRING {
+                    dataOptions.put(field, null);
+                    columns.add(new ColumnWrapper(field, 'text', null));
+                }
+                when else { 
+                    dataOptions.put(field, null);
+                    columns.add(new ColumnWrapper(field, null, null));               
+                 }
             }
         }
 
-        return JSON.serialize(column);  
+        List<Map<String, Object>> finalyData = new List<Map<String, Object>>();
+
+        for(sObject record: getData(objectApiName, fields)) {
+            Map<String, Object> data = new Map<String, Object>();
+            
+            data.put('Id', record.Id);
+
+            for(String field : dataOptions.keySet()){
+                data.put(field, record.get(field)); 
+                data.put(field + '_piskListOptions', dataOptions.get(field)); 
+            }
+            finalyData.add(data);
+
+        }
+        result.put('data', finalyData);
+        result.put('columns', columns);
+
+        return result;  
     }
 
-    private static Schema.DescribeFieldResult getFieldDescribe (String objectName, String fieldName) {             
+    private static Map<String,Schema.SObjectField> getObjectDescribe (String objectName) {             
         return Schema.getGlobalDescribe()
             .get(objectName)
             .getDescribe()
-            .fields.getMap()
-            .get(fieldName)
-            .getDescribe();
+            .fields.getMap();
     }
 
-    private class ColumnWrapper {
-        String label;
-        String fieldName;
-        String type;
-        Boolean editable;
-        TypeAttributes typeAttributes;
+    public class ColumnWrapper {
+        @AuraEnabled public String label;
+        @AuraEnabled public String fieldName;
+        @AuraEnabled public String type;
+        @AuraEnabled public Boolean editable;
+        @AuraEnabled public TypeAttributes typeAttributes;
 
 
-        private columnWrapper(String objectName, String fieldName, String type, TypeAttributes typeAttributes) {
+        private columnWrapper (String fieldName, String type, TypeAttributes typeAttributes) {
             this.label = fieldName;
             this.fieldName = fieldName;
             this.editable = true;
@@ -55,27 +92,17 @@ public with sharing class customDataTableController {
         } 
     }
 
-    private class TypeAttributes { 
-        String placeholder;
-        FieldName options;
-        FieldName value;
-        FieldName context;
-        Map<String, List<Schema.PicklistEntry>> picklistoptions;
+    public class TypeAttributes { 
+        @AuraEnabled public String placeholder;
+        @AuraEnabled public Map<String, String> options;
+        @AuraEnabled public Map<String, String>  value;
+        @AuraEnabled public Map<String, String>  context;
 
-        private typeAttributes(String fieldName, Map<String, List<Schema.PicklistEntry>> picklistoptions) {
-            this.placeholder = 'Choose Type';
-            this.value = new FieldName(fieldName);
-            this.options = new FieldName(fieldName + '_options');
-            this.context = new FieldName('Id');
-            this.picklistoptions = picklistoptions;
-        }
-    }
-
-    private class FieldName {
-        String fieldName;
-
-        private fieldName(String fieldName) {
-            this.fieldName = fieldName;
+       private typeAttributes (String fieldName, String placeholder, String context) {
+            this.placeholder = placeholder;
+            this.value = new Map<String, String> {'fieldName' => fieldName};
+            this.options = new Map<String, String> {'fieldName' => fieldName + '_piskListOptions'};
+            this.context = new Map<String, String> {'fieldName' => context};
         }
     }
 }

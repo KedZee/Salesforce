@@ -1,7 +1,7 @@
 <template>
     <lightning-card  variant="Narrow"  title="PickList In LWC Inline Datatable Edit" icon-name="standard:folder" class="cardSpinner">
         <div class="slds-var-p-around_small">
-            <template if:true={data}>
+            <template lwc:if={data}>
                 <c-custom-data-table
                     key-field="Id"
                     data={data} 

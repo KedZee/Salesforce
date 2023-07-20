@@ -1,8 +1,7 @@
 import { LightningElement, track, api } from 'lwc';
 import { updateRecord } from 'lightning/uiRecordApi';
-import getDataTable from '@salesforce/apex/customDataTableController.getDataTable';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import getColumnTable from '@salesforce/apex/customDataTableController.getColumnTable';
+import getDataTableInformation from '@salesforce/apex/customDataTableController.getDataTableInformation';
 
 export default class DemoCustomDataTable extends LightningElement {
     @track draftValues = [];
@@ -11,22 +10,17 @@ export default class DemoCustomDataTable extends LightningElement {
     @api objectApiName;
     @api fields;
 
-    @track columns ;
+    @track columns;
 
     connectedCallback() {
         this.getAllData();
     }
 
     getAllData() {
-        getColumnTable({objectApiName: this.objectApiName, fields: this.fields}) 
+        getDataTableInformation({objectApiName: this.objectApiName, fields: this.fields}) 
         .then(result => {
-            this.columns = JSON.parse(result);
-            this.picklistOptions = this.columns.map(item => item?.typeAttributes?.picklistoptions).filter(item => item).reduce((acc, item) =>  item, {})
-
-            return getDataTable({objectApiName: this.objectApiName, fields: this.fields}) 
-        }).then(result => {
-            this.data = result.map(obj => ({ ...obj, ...this.picklistOptions }))
-            
+            this.columns = result.columns; 
+            this.data = result.data; 
         })
     }
 
@@ -64,12 +58,11 @@ export default class DemoCustomDataTable extends LightningElement {
     }  
 
     showToast(title, message, variant, mode) {
-        const evt = new ShowToastEvent({
+        this.dispatchEvent(new ShowToastEvent({
             title: title,
             message: message,
             variant: variant,
             mode: mode
-        });
-        this.dispatchEvent(evt);
+        }));
     }
 }
