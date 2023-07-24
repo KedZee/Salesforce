@@ -1,12 +1,10 @@
 import LightningDatatable from 'lightning/datatable';
 import picklistColumn from './picklistColumn.html';
-import pickliststatic from './pickliststatic.html'
 
 export default class CustomDataTable extends LightningDatatable {
     static customTypes = {
         picklistColumn: {
-            template: pickliststatic,
-            editTemplate: picklistColumn,
+            template: picklistColumn,
             standardCellLayout: true,
             typeAttributes: ['label', 'placeholder', 'options', 'value', 'context', 'variant','name']
         }
