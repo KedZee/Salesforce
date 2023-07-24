@@ -73,7 +73,6 @@ export default class DemoCustomDataTable extends LightningElement {
         }
 
         this.draftValues = [...copyDraftValues];
-        console.log('handleCancel===', JSON.parse(JSON.stringify(this.lastSaveData)));
     }
 
     updateDataValues(updateItem) {
@@ -95,10 +94,8 @@ export default class DemoCustomDataTable extends LightningElement {
     }
 
     handleCancel() {
-        console.log('handleCancel==w=', JSON.parse(JSON.stringify(this.lastSaveData)));
         this.draftValues = [];
-        //this.data = this.lastSaveData;
-        console.log('handleCancel===', JSON.parse(JSON.stringify(this.data)));
+        this.data = this.lastSaveData;
     }  
 
     showToast(title, message, variant, mode) {
