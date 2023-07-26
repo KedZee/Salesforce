@@ -6,12 +6,14 @@
                     key-field="Id"
                     data={data} 
                     columns={columns} 
-                    onvalueselect={handleSelection}
+                    onvaluechange={handleValueChange}
                     draft-values={draftValues} 
-                    oncellchange={handleCellChange}
+                    oncellchange={handleCellChange} 
                     onsave={handleSave}
                     oncancel={handleCancel}
-                    hide-checkbox-column>
+                    hide-checkbox-column="true" 
+                    data-record="Id" 
+                    show-row-number-column="false">
                 </c-custom-data-table>
             </template>
         </div>

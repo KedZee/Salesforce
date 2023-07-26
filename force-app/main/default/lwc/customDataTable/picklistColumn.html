@@ -1,12 +1,12 @@
 <template>
-    <lightning-combobox 
-        name="picklist" 
-        data-inputable="true" 
+    <c-custom-combobox 
+        data-inputable="true"
         label={typeAttributes.label} 
-        value={editedValue} 
+        value={typeAttributes.value}
         placeholder={typeAttributes.placeholder} 
         options={typeAttributes.options} 
-        variant='label-hidden'
-        dropdown-alignment="auto"
-    ></lightning-combobox>
+        context={typeAttributes.context}
+        variant={typeAttributes.variant} 
+        name={typeAttributes.name}>
+    </c-custom-combobox >
 </template>

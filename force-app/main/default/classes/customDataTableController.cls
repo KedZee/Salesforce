@@ -9,10 +9,8 @@ public with sharing class customDataTableController {
     }
 
     @AuraEnabled
-    public static Map<String, Object> getDataTableInformation (String objectApiName, String fields){
+    public static Map<String, Object>  getTableInformation(String objectApiName, String fields){
         List<ColumnWrapper> columns = new List<ColumnWrapper>();
-        Map<String, Object> dataOptions = new Map<String, Object>();
-        Map<String, Object> result = new Map<String, Object>();
 
         String fieldReplase = fields.replace(';',', ');
         List<String> fieldList = fields.split(';'); 
@@ -24,48 +22,35 @@ public with sharing class customDataTableController {
             
             switch on apexFieldType {
                 when PICKLIST { 
-                    List<Map<String, String>> picklistOptions = new List<Map<String, String>>();
-
-                    for( Schema.PicklistEntry pickList : fieldInformation.getPicklistValues()){
-                        Map<String, String> picklistOption = new Map<String, String>();
-                        picklistOption.put('label', pickList.getLabel());
-                        picklistOption.put('value', pickList.getValue());
-                       
-                        picklistOptions.add(picklistOption);
-                    }     
-    
-                    dataOptions.put(field, picklistOptions);
-                    columns.add(new ColumnWrapper(field, 'picklistColumn', new TypeAttributes(field, 'Choose' + field, 'Id')));
+                    columns.add(new ColumnWrapper(field, 'picklistColumn', false, new TypeAttributes(field, getPicklistOptions(fieldInformation), 'Choose' + field, 'Id')));
                 }
                 when STRING {
-                    dataOptions.put(field, null);
-                    columns.add(new ColumnWrapper(field, 'text', null));
+                    columns.add(new ColumnWrapper(field, 'text', true, null));
                 }
                 when else { 
-                    dataOptions.put(field, null);
-                    columns.add(new ColumnWrapper(field, null, null));               
+                    columns.add(new ColumnWrapper(field, null, true, null));               
                  }
             }
         }
 
-        List<Map<String, Object>> finalyData = new List<Map<String, Object>>();
+        return new Map<String, Object> {
+            'columns' => columns,
+            'data' => getData(objectApiName, fields)
+        };
+    }
 
-        for(sObject record: getData(objectApiName, fields)) {
-            Map<String, Object> data = new Map<String, Object>();
-            
-            data.put('Id', record.Id);
+    private static List<Map<String, String>> getPicklistOptions (Schema.DescribeFieldResult fieldInformation) {
+        List<Map<String, String>> picklistOptions = new List<Map<String, String>>();
 
-            for(String field : dataOptions.keySet()){
-                data.put(field, record.get(field)); 
-                data.put(field + '_piskListOptions', dataOptions.get(field)); 
-            }
-            finalyData.add(data);
+        for( Schema.PicklistEntry pickList : fieldInformation.getPicklistValues()){
+            Map<String, String> picklistOption = new Map<String, String>();
+            picklistOption.put('label', pickList.getLabel());
+            picklistOption.put('value', pickList.getValue());
+           
+            picklistOptions.add(picklistOption);
+        }     
 
-        }
-        result.put('data', finalyData);
-        result.put('columns', columns);
-
-        return result;  
+        return picklistOptions;
     }
 
     private static Map<String,Schema.SObjectField> getObjectDescribe (String objectName) {             
@@ -83,10 +68,10 @@ public with sharing class customDataTableController {
         @AuraEnabled public TypeAttributes typeAttributes;
 
 
-        private columnWrapper (String fieldName, String type, TypeAttributes typeAttributes) {
+        private columnWrapper (String fieldName, String type, Boolean editable, TypeAttributes typeAttributes) {
             this.label = fieldName;
             this.fieldName = fieldName;
-            this.editable = true;
+            this.editable = editable;
             this.type = type;
             this.typeAttributes = typeAttributes;
         } 
@@ -94,15 +79,20 @@ public with sharing class customDataTableController {
 
     public class TypeAttributes { 
         @AuraEnabled public String placeholder;
-        @AuraEnabled public Map<String, String> options;
-        @AuraEnabled public Map<String, String>  value;
-        @AuraEnabled public Map<String, String>  context;
+        @AuraEnabled public String name;
+        @AuraEnabled public String fieldName;
+        @AuraEnabled public List<Map<String, String>> options;
+        @AuraEnabled public Map<String, String> value;
+        @AuraEnabled public Map<String, String> context;
+        @AuraEnabled public List<Map<String, String>> picklistOptions;
 
-       private typeAttributes (String fieldName, String placeholder, String context) {
+       private typeAttributes (String fieldName, List<Map<String, String>> picklistOptions, String placeholder, String context) {
             this.placeholder = placeholder;
             this.value = new Map<String, String> {'fieldName' => fieldName};
-            this.options = new Map<String, String> {'fieldName' => fieldName + '_piskListOptions'};
+            this.options = picklistOptions;
             this.context = new Map<String, String> {'fieldName' => context};
+            this.name = fieldName;
+            this.fieldName =  fieldName;
         }
     }
 }
