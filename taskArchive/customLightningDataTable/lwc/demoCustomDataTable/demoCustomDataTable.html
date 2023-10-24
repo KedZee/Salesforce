@@ -1,0 +1,21 @@
+<template>
+    <lightning-card  variant="Narrow"  title="PickList In LWC Inline Datatable Edit" icon-name="standard:folder" class="cardSpinner">
+        <div class="slds-var-p-around_small">
+            <template lwc:if={data}>
+                <c-custom-data-table
+                    key-field="Id"
+                    data={data} 
+                    columns={columns} 
+                    onvaluechange={handleValueChange}
+                    draft-values={draftValues} 
+                    oncellchange={handleCellChange} 
+                    onsave={handleSave}
+                    oncancel={handleCancel}
+                    hide-checkbox-column="true" 
+                    data-record="Id" 
+                    show-row-number-column="false">
+                </c-custom-data-table>
+            </template>
+        </div>
+    </lightning-card>
+</template>
