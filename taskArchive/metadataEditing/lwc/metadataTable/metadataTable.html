@@ -1,0 +1,16 @@
+<template>
+    <div style="display: flex; justify-content: flex-end; padding: 5px 0;">
+        <lightning-button label="Create" onclick={openModal} class="slds-m-left_x-small"></lightning-button>
+        <lightning-button label="Delete"  onclick={handleDelete} class="slds-m-left_x-small"></lightning-button>
+    </div>
+
+    <div style="height: 300px;">
+        <lightning-datatable
+                key-field="id"
+                data={data}
+                columns={columns}
+                onrowaction={handleRowAction}>
+        </lightning-datatable>
+    </div>
+
+</template>
